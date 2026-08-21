@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Notification History - VehicleCare</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+</head>
+
+<body>
+
+
+<nav class="navbar">
+
+    <div class="logo">
+        🚗 VehicleCare
+    </div>
+
+
+    <div class="nav-links">
+
+        <a href="dashboard.html">
+            Dashboard
+        </a>
+
+        <a href="vehicles.html">
+            My Vehicles
+        </a>
+
+        <button onclick="logout()">
+            Logout
+        </button>
+
+    </div>
+
+</nav>
+
+
+<main class="services-page">
+
+    <div class="page-header">
+
+        <div>
+
+            <p class="tag">
+                VEHICLECARE NOTIFICATIONS
+            </p>
+
+            <h1>
+                📧 Notification History
+            </h1>
+
+            <p>
+                View all automatic service,
+                insurance and PUC reminder emails.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="service-form">
+
+        <input
+            type="search"
+            id="notificationSearch"
+            placeholder="🔍 Search notifications..."
+        >
+
+    </div>
+
+
+    <section>
+
+        <div id="notificationList">
+
+            <p>
+                Loading notification history...
+            </p>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script src="js/notification-history.js"></script>
+
+</body>
+
+</html>

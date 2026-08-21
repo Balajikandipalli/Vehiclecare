@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>My Vehicles - VehicleCare</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <style>
+
+        /* ==========================
+           VEHICLE SEARCH
+           ========================== */
+
+        .vehicle-search-section {
+            margin: 25px 0;
+        }
+
+        .vehicle-search {
+            width: 100%;
+            max-width: 600px;
+            padding: 14px 18px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+
+        /* ==========================
+           STATUS
+           ========================== */
+
+        .vehicle-status-section {
+            margin-top: 20px;
+            padding-top: 18px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .vehicle-status-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .vehicle-status-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .vehicle-status-item {
+            padding: 9px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .status-healthy {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-due {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-overdue {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-loading {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .vehicle-card {
+            position: relative;
+        }
+
+        .no-search-results {
+            width: 100%;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+
+        @media (max-width: 700px) {
+
+            .vehicle-status-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- NAVBAR -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            🚗 VehicleCare
+        </div>
+
+        <div class="nav-links">
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <button
+                type="button"
+                onclick="logout()"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <!-- MAIN -->
+
+    <main class="vehicles-page">
+
+
+        <!-- HEADER -->
+
+        <div class="page-header">
+
+            <div>
+
+                <p class="tag">
+                    VEHICLE MANAGEMENT
+                </p>
+
+                <h1>
+                    My Vehicles
+                </h1>
+
+                <p>
+                    Manage all your vehicles in one place.
+                </p>
+
+            </div>
+
+
+            <button
+                class="primary-btn"
+                type="button"
+                onclick="openVehicleForm()"
+            >
+                + Add Vehicle
+            </button>
+
+        </div>
+
+
+        <!-- SEARCH -->
+
+        <div class="vehicle-search-section">
+
+            <input
+                type="search"
+                id="vehicleSearch"
+                class="vehicle-search"
+                placeholder="🔍 Search by vehicle number, make or model..."
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <!-- ADD / EDIT VEHICLE FORM -->
+
+        <div
+            id="vehicleForm"
+            class="vehicle-form"
+            style="display: none;"
+        >
+
+            <h2>
+                Add Vehicle
+            </h2>
+
+
+            <form id="addVehicleForm">
+
+
+                <input
+                    type="text"
+                    id="vehicle_number"
+                    placeholder="Vehicle Number (e.g. AP31AB1234)"
+                    required
+                >
+
+
+                <input
+                    type="text"
+                    id="make"
+                    placeholder="Vehicle Make (e.g. Honda)"
+                    required
+                >
+
+
+                <input
+                    type="text"
+                    id="model"
+                    placeholder="Vehicle Model (e.g. City)"
+                    required
+                >
+
+
+                <input
+                    type="number"
+                    id="manufacturing_year"
+                    placeholder="Manufacturing Year"
+                    min="1900"
+                    max="2100"
+                >
+
+
+                <select id="fuel_type">
+
+                    <option value="">
+                        Select Fuel Type
+                    </option>
+
+                    <option value="Petrol">
+                        Petrol
+                    </option>
+
+                    <option value="Diesel">
+                        Diesel
+                    </option>
+
+                    <option value="Electric">
+                        Electric
+                    </option>
+
+                    <option value="CNG">
+                        CNG
+                    </option>
+
+                    <option value="Hybrid">
+                        Hybrid
+                    </option>
+
+                </select>
+
+
+                <input
+                    type="number"
+                    id="current_km"
+                    placeholder="Current KM"
+                    min="0"
+                    value="0"
+                >
+
+
+                <label>
+                    Purchase Date
+                </label>
+
+
+                <input
+                    type="date"
+                    id="purchase_date"
+                >
+
+
+                <div class="form-buttons">
+
+                    <button
+                        type="submit"
+                        class="primary-btn"
+                    >
+                        Add Vehicle
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="secondary-btn"
+                        onclick="closeVehicleForm()"
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+            </form>
+
+
+            <p id="vehicleMessage"></p>
+
+        </div>
+
+
+        <!-- VEHICLE LIST -->
+
+        <div
+            id="vehicleList"
+            class="vehicle-grid"
+        >
+
+            <p>
+                Loading vehicles...
+            </p>
+
+        </div>
+
+
+    </main>
+
+
+    <script src="js/vehicles.js"></script>
+
+</body>
+
+</html>

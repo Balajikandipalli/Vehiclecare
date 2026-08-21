@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Dashboard - VehicleCare</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <style>
+
+        /* ==========================
+           DOCUMENT ALERTS
+           ========================== */
+
+        .document-alerts-section {
+            margin-top: 30px;
+        }
+
+        .document-alert-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 18px;
+            margin-top: 18px;
+        }
+
+        .document-alert-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .document-alert-icon {
+            font-size: 30px;
+            min-width: 45px;
+        }
+
+        .document-alert-content {
+            flex: 1;
+        }
+
+        .document-alert-content h3 {
+            margin: 0 0 6px;
+        }
+
+        .document-alert-content p {
+            margin: 5px 0;
+            color: #64748b;
+        }
+
+        .document-alert-status {
+            display: inline-block;
+            margin-top: 7px;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .document-alert-overdue {
+            border-left: 5px solid #ef4444;
+        }
+
+        .document-alert-due {
+            border-left: 5px solid #f59e0b;
+        }
+
+        .document-alert-overdue
+        .document-alert-status {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .document-alert-due
+        .document-alert-status {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .no-document-alerts {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .no-document-alerts-icon {
+            font-size: 35px;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 800px) {
+
+            .document-alert-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- NAVBAR -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            🚗 VehicleCare
+        </div>
+
+        <div class="nav-links">
+
+            <a href="vehicles.html">
+                My Vehicles
+            </a>
+
+            <button
+                type="button"
+                onclick="openAccountSettings()"
+            >
+                ⚙️ Account
+            </button>
+
+            <button
+                type="button"
+                onclick="logout()"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <!-- DASHBOARD -->
+
+    <main class="dashboard-page">
+
+
+        <div class="dashboard-header">
+
+            <p class="tag">
+                VEHICLECARE DASHBOARD
+            </p>
+
+            <h1>
+
+                Welcome,
+
+                <span id="username">
+                    User
+                </span>!
+
+            </h1>
+
+            <p>
+                Manage your vehicles and stay on top
+                of every service.
+            </p>
+
+        </div>
+
+
+        <!-- QUICK ACTION -->
+
+        <div class="dashboard-actions">
+
+            <a
+                href="vehicles.html"
+                class="primary-btn"
+            >
+                🚗 My Vehicles
+            </a>
+
+            <a
+    href="notification-history.html"
+    class="primary-btn"
+>
+    📧 Notification History
+</a>
+
+        </div>
+
+        <!-- ==========================
+     DASHBOARD STATUS CARDS
+     ========================== -->
+
+<section class="dashboard-status-section">
+
+    <h2>
+        📊 Overall Status
+    </h2>
+
+    <div class="dashboard-status-grid">
+
+        <!-- VEHICLES -->
+
+        <div
+            class="dashboard-status-card"
+            onclick="window.location.href='vehicles.html'"
+        >
+
+            <div class="dashboard-status-icon">
+                🚗
+            </div>
+
+            <div class="dashboard-status-content">
+
+                <h3>
+                    My Vehicles
+                </h3>
+
+                <strong id="vehicleCount">
+                    0
+                </strong>
+
+                <p>
+                    Registered vehicles
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- SERVICES -->
+
+        <div
+            class="dashboard-status-card"
+            onclick="window.location.href='vehicles.html'"
+        >
+
+            <div class="dashboard-status-icon">
+                🔧
+            </div>
+
+            <div class="dashboard-status-content">
+
+                <h3>
+                    Service Alerts
+                </h3>
+
+                <strong id="serviceAlertCount">
+                    0
+                </strong>
+
+                <p>
+                    Need attention
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- INSURANCE -->
+
+        <div
+            class="dashboard-status-card"
+            onclick="window.location.href='vehicles.html'"
+        >
+
+            <div class="dashboard-status-icon">
+                🛡️
+            </div>
+
+            <div class="dashboard-status-content">
+
+                <h3>
+                    Insurance Alerts
+                </h3>
+
+                <strong id="insuranceAlertCount">
+                    0
+                </strong>
+
+                <p>
+                    Expired or expiring
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- PUC -->
+
+        <div
+            class="dashboard-status-card"
+            onclick="window.location.href='vehicles.html'"
+        >
+
+            <div class="dashboard-status-icon">
+                📄
+            </div>
+
+            <div class="dashboard-status-content">
+
+                <h3>
+                    PUC Alerts
+                </h3>
+
+                <strong id="pucAlertCount">
+                    0
+                </strong>
+
+                <p>
+                    Expired or expiring
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+        <!-- SERVICE SUMMARY -->
+
+        <section class="reminder-section">
+
+            <h2>
+                🔔 Service Reminder Summary
+            </h2>
+
+
+            <div class="reminder-grid">
+
+
+                <!-- OVERDUE -->
+
+                <div class="reminder-card overdue-card">
+
+                    <div class="reminder-icon">
+                        🔴
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Overdue
+                        </h3>
+
+                        <strong id="overdueCount">
+                            0
+                        </strong>
+
+                        <p>
+                            Services need attention
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DUE SOON -->
+
+                <div class="reminder-card due-card">
+
+                    <div class="reminder-icon">
+                        🟡
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Due Soon
+                        </h3>
+
+                        <strong id="dueSoonCount">
+                            0
+                        </strong>
+
+                        <p>
+                            Services coming soon
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- UPCOMING -->
+
+                <div class="reminder-card upcoming-card">
+
+                    <div class="reminder-icon">
+                        🟢
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Upcoming
+                        </h3>
+
+                        <strong id="upcomingCount">
+                            0
+                        </strong>
+
+                        <p>
+                            Future service schedules
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- SERVICE ALERTS -->
+
+        <section class="alerts-section">
+
+            <h2>
+                🔧 Service Alerts
+            </h2>
+
+            <div id="serviceAlerts">
+
+                <p>
+                    Loading service reminders...
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- INSURANCE & PUC ALERTS -->
+
+        <section class="alerts-section document-alerts-section">
+
+            <h2>
+                🛡️ Insurance & PUC Alerts
+            </h2>
+
+            <div id="documentAlerts">
+
+                <p>
+                    Loading insurance and PUC alerts...
+                </p>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- ACCOUNT SETTINGS MODAL -->
+
+    <div
+        id="accountModal"
+        class="account-modal"
+        style="display:none;"
+    >
+
+        <div class="account-modal-card">
+
+            <button
+                type="button"
+                class="account-close"
+                onclick="closeAccountSettings()"
+            >
+                ×
+            </button>
+
+            <p class="tag">
+                ACCOUNT SETTINGS
+            </p>
+
+            <h2>
+                ⚙️ Update Email
+            </h2>
+
+            <p class="account-description">
+                Service reminders will be sent to this email.
+            </p>
+
+            <label>
+                Current Email
+            </label>
+
+            <input
+                type="email"
+                id="currentEmail"
+                readonly
+            >
+
+            <label>
+                New Email
+            </label>
+
+            <input
+                type="email"
+                id="newEmail"
+                placeholder="Enter your real email"
+                autocomplete="email"
+            >
+
+            <label>
+                Confirm New Email
+            </label>
+
+            <input
+                type="email"
+                id="confirmEmail"
+                placeholder="Re-enter your email"
+                autocomplete="email"
+            >
+
+            <p
+                id="emailMessage"
+                class="account-message"
+            ></p>
+
+            <div class="account-actions">
+
+                <button
+                    type="button"
+                    class="secondary-btn"
+                    onclick="closeAccountSettings()"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="button"
+                    class="primary-btn"
+                    id="updateEmailButton"
+                    onclick="updateEmail()"
+                >
+                    Update Email
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="js/dashboard.js"></script>
+
+</body>
+
+</html>

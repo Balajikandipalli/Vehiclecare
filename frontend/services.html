@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Service Schedule - VehicleCare</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <style>
+
+        /* ==========================
+           SERVICE SUMMARY
+           ========================== */
+
+        .service-summary-section {
+            margin: 25px 0;
+        }
+
+        .service-summary-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .service-summary-card {
+            padding: 20px;
+            border-radius: 15px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+        }
+
+        .service-summary-card span {
+            display: block;
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .service-summary-card strong {
+            display: block;
+            font-size: 28px;
+        }
+
+        .summary-overdue strong {
+            color: #dc2626;
+        }
+
+        .summary-due strong {
+            color: #d97706;
+        }
+
+        .summary-upcoming strong {
+            color: #16a34a;
+        }
+
+
+        /* ==========================
+           SEARCH
+           ========================== */
+
+        .service-filter-section {
+            margin: 25px 0;
+        }
+
+        .service-search {
+            width: 100%;
+            max-width: 600px;
+            padding: 14px 18px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+
+        /* ==========================
+           SERVICE CARD
+           ========================== */
+
+        .service-card {
+            position: relative;
+        }
+
+        .service-card-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .service-card-actions button {
+            cursor: pointer;
+        }
+
+
+        /* ==========================
+           STATUS GROUP
+           ========================== */
+
+        .service-group {
+            margin-top: 30px;
+        }
+
+        .service-group-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .service-group-title h2 {
+            margin: 0;
+        }
+
+        .service-group-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            padding: 0 8px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .count-overdue {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .count-due {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .count-upcoming {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+
+        /* ==========================
+           EMPTY
+           ========================== */
+
+        .service-empty {
+            padding: 30px;
+            text-align: center;
+            background: #f8fafc;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+        }
+
+
+        /* ==========================
+           RESPONSIVE
+           ========================== */
+
+        @media (max-width: 900px) {
+
+            .service-summary-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .service-summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- NAVBAR -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            🚗 VehicleCare
+        </div>
+
+
+        <div class="nav-links">
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+
+            <a href="vehicles.html">
+                My Vehicles
+            </a>
+
+
+            <button
+                type="button"
+                onclick="logout()"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <!-- MAIN -->
+
+    <main class="services-page">
+
+
+        <!-- HEADER -->
+
+        <div class="page-header">
+
+            <div>
+
+                <p class="tag">
+                    VEHICLE MAINTENANCE
+                </p>
+
+
+                <h1>
+                    Service Schedule
+                </h1>
+
+
+                <p>
+                    Track maintenance and never miss
+                    your next service.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="primary-btn"
+                onclick="openServiceForm()"
+            >
+                + Add Service
+            </button>
+
+        </div>
+
+
+        <!-- SUMMARY -->
+
+        <section class="service-summary-section">
+
+            <div class="service-summary-grid">
+
+
+                <div class="service-summary-card">
+
+                    <span>
+                        🔧 Total Services
+                    </span>
+
+                    <strong id="totalServiceCount">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div
+                    class="service-summary-card summary-overdue"
+                >
+
+                    <span>
+                        🔴 Overdue
+                    </span>
+
+                    <strong id="overdueServiceCount">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div
+                    class="service-summary-card summary-due"
+                >
+
+                    <span>
+                        🟡 Due Soon
+                    </span>
+
+                    <strong id="dueSoonServiceCount">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div
+                    class="service-summary-card summary-upcoming"
+                >
+
+                    <span>
+                        🟢 Upcoming
+                    </span>
+
+                    <strong id="upcomingServiceCount">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- SEARCH -->
+
+        <section class="service-filter-section">
+
+            <input
+                type="search"
+                id="serviceSearch"
+                class="service-search"
+                placeholder="🔍 Search service type, center or notes..."
+                autocomplete="off"
+            >
+
+        </section>
+
+
+        <!-- SERVICE FORM -->
+
+        <div
+            id="serviceForm"
+            class="service-form"
+            style="display: none;"
+        >
+
+            <h2 id="serviceFormTitle">
+                Add Service
+            </h2>
+
+
+            <form id="addServiceForm">
+
+
+                <select
+                    id="service_type"
+                    required
+                >
+
+                    <option value="">
+                        Select Service Type
+                    </option>
+
+                    <option value="General Service">
+                        General Service
+                    </option>
+
+                    <option value="Oil Change">
+                        Oil Change
+                    </option>
+
+                    <option value="Brake Service">
+                        Brake Service
+                    </option>
+
+                    <option value="Tyre Service">
+                        Tyre Service
+                    </option>
+
+                    <option value="Battery Service">
+                        Battery Service
+                    </option>
+
+                    <option value="AC Service">
+                        AC Service
+                    </option>
+
+                    <option value="Engine Service">
+                        Engine Service
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+
+                <label>
+                    Service Date
+                </label>
+
+
+                <input
+                    type="date"
+                    id="service_date"
+                    required
+                >
+
+
+                <input
+                    type="number"
+                    id="service_km"
+                    placeholder="Service KM"
+                    min="0"
+                >
+
+
+                <label>
+                    Next Service Date
+                </label>
+
+
+                <input
+                    type="date"
+                    id="next_service_date"
+                >
+
+
+                <input
+                    type="number"
+                    id="next_service_km"
+                    placeholder="Next Service KM"
+                    min="0"
+                >
+
+
+                <input
+                    type="number"
+                    id="cost"
+                    placeholder="Service Cost ₹"
+                    min="0"
+                    step="0.01"
+                >
+
+
+                <input
+                    type="text"
+                    id="service_center"
+                    placeholder="Service Center"
+                >
+
+
+                <textarea
+                    id="notes"
+                    placeholder="Notes"
+                    rows="4"
+                ></textarea>
+
+
+                <select id="status">
+
+                    <option value="Completed">
+                        Completed
+                    </option>
+
+                    <option value="Scheduled">
+                        Scheduled
+                    </option>
+
+                    <option value="Pending">
+                        Pending
+                    </option>
+
+                </select>
+
+
+                <div class="form-buttons">
+
+                    <button
+                        type="submit"
+                        class="primary-btn"
+                        id="serviceSubmitButton"
+                    >
+                        Add Service
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="secondary-btn"
+                        onclick="closeServiceForm()"
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+            </form>
+
+
+            <p id="serviceMessage"></p>
+
+        </div>
+
+
+        <!-- SERVICE HISTORY -->
+
+        <section>
+
+            <h2 class="section-title">
+                📋 Service History
+            </h2>
+
+
+            <div id="serviceList">
+
+                <p>
+                    Loading services...
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="js/services.js"></script>
+
+</body>
+
+</html>

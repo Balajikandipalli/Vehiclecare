@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Vehicle Details - VehicleCare</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <style>
+
+        /* ==========================
+           SERVICE OVERVIEW
+           ========================== */
+
+        .service-overview-card {
+            margin-top: 25px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 25px;
+        }
+
+        .service-overview-card h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .service-overview-subtitle {
+            color: #64748b;
+            margin-bottom: 22px;
+        }
+
+        .service-summary-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .service-summary-box {
+            padding: 18px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+        }
+
+        .service-summary-box span {
+            display: block;
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .service-summary-box strong {
+            display: block;
+            font-size: 24px;
+        }
+
+        .next-service-box {
+            margin-top: 20px;
+            padding: 18px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+        }
+
+        .next-service-box h3 {
+            margin-top: 0;
+        }
+
+        .next-service-box p {
+            margin: 7px 0;
+        }
+
+
+        /* ==========================
+           DOCUMENT SUMMARY
+           ========================== */
+
+        .documents-card {
+            margin-top: 25px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 25px;
+        }
+
+        .documents-card h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .documents-subtitle {
+            color: #64748b;
+            margin-bottom: 22px;
+        }
+
+        .document-summary-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .document-summary {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            background: #f8fafc;
+        }
+
+        .document-summary h3 {
+            margin: 0 0 12px;
+        }
+
+        .document-summary p {
+            margin: 7px 0;
+        }
+
+        .document-summary strong {
+            color: #111827;
+        }
+
+        .document-status-badge {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .status-valid {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-due {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-overdue {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .status-not-added {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .document-manage-actions {
+            margin-top: 22px;
+        }
+
+
+        /* ==========================
+           RESPONSIVE
+           ========================== */
+
+        @media (max-width: 900px) {
+
+            .service-summary-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+        }
+
+        @media (max-width: 700px) {
+
+            .document-summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .service-summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- NAVBAR -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            🚗 VehicleCare
+        </div>
+
+
+        <div class="nav-links">
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+
+            <a href="vehicles.html">
+                My Vehicles
+            </a>
+
+
+            <button
+                type="button"
+                onclick="logout()"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <!-- MAIN -->
+
+    <main class="vehicle-details-page">
+
+
+        <!-- BACK -->
+
+        <div class="details-header">
+
+            <button
+                class="secondary-btn"
+                type="button"
+                onclick="goBack()"
+            >
+                ← Back to Vehicles
+            </button>
+
+        </div>
+
+
+        <!-- LOADING -->
+
+        <div
+            id="loading"
+            class="loading"
+        >
+            Loading vehicle details...
+        </div>
+
+
+        <!-- VEHICLE DETAILS -->
+
+        <div
+            id="vehicleDetails"
+            style="display: none;"
+        >
+
+
+            <!-- VEHICLE INFORMATION -->
+
+            <div class="vehicle-details-card">
+
+                <div class="vehicle-large-icon">
+                    🚗
+                </div>
+
+
+                <div class="vehicle-title">
+
+                    <p class="tag">
+                        VEHICLE DETAILS
+                    </p>
+
+
+                    <h1 id="vehicleName">
+                        Vehicle
+                    </h1>
+
+
+                    <p
+                        id="vehicleNumber"
+                        class="vehicle-number"
+                    >
+                        -
+                    </p>
+
+                </div>
+
+
+                <!-- DETAILS -->
+
+                <div class="details-grid">
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            🏭 Make
+                        </span>
+
+                        <strong id="make">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            🚘 Model
+                        </span>
+
+                        <strong id="model">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            📅 Manufacturing Year
+                        </span>
+
+                        <strong id="year">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            ⛽ Fuel Type
+                        </span>
+
+                        <strong id="fuel">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            🛣️ Current KM
+                        </span>
+
+                        <strong id="km">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            📆 Purchase Date
+                        </span>
+
+                        <strong id="purchaseDate">
+                            -
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ACTIONS -->
+
+                <div class="details-actions">
+
+                    <button
+                        class="primary-btn"
+                        id="editButton"
+                        type="button"
+                    >
+                        ✏️ Edit Vehicle
+                    </button>
+
+
+                    <button
+                        class="delete-btn"
+                        id="deleteButton"
+                        type="button"
+                    >
+                        🗑️ Delete Vehicle
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- SERVICE OVERVIEW -->
+
+            <div class="service-overview-card">
+
+                <h2>
+                    🔧 Service Overview
+                </h2>
+
+
+                <p class="service-overview-subtitle">
+                    View the current maintenance status
+                    of this vehicle.
+                </p>
+
+
+                <div class="service-summary-grid">
+
+
+                    <div class="service-summary-box">
+
+                        <span>
+                            Total Services
+                        </span>
+
+                        <strong id="totalServices">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="service-summary-box">
+
+                        <span>
+                            🔴 Overdue
+                        </span>
+
+                        <strong id="overdueServices">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="service-summary-box">
+
+                        <span>
+                            🟡 Due Soon
+                        </span>
+
+                        <strong id="dueSoonServices">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="service-summary-box">
+
+                        <span>
+                            🟢 Upcoming
+                        </span>
+
+                        <strong id="upcomingServices">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- NEXT SERVICE -->
+
+                <div class="next-service-box">
+
+                    <h3>
+                        📅 Next Service
+                    </h3>
+
+
+                    <p>
+                        <strong>
+                            Service:
+                        </strong>
+
+                        <span id="nextServiceType">
+                            Not scheduled
+                        </span>
+                    </p>
+
+
+                    <p>
+                        <strong>
+                            Date:
+                        </strong>
+
+                        <span id="nextServiceDate">
+                            Not scheduled
+                        </span>
+                    </p>
+
+
+                    <p>
+                        <strong>
+                            KM:
+                        </strong>
+
+                        <span id="nextServiceKm">
+                            Not scheduled
+                        </span>
+                    </p>
+
+                </div>
+
+
+                <div class="document-manage-actions">
+
+                    <button
+                        class="primary-btn"
+                        id="serviceButton"
+                        type="button"
+                    >
+                        🔧 Manage Services
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- INSURANCE & PUC -->
+
+            <div class="documents-card">
+
+                <h2>
+                    🛡️ Insurance & PUC
+                </h2>
+
+
+                <p class="documents-subtitle">
+                    Keep your vehicle insurance and
+                    Pollution Under Control certificate
+                    details and expiry dates in one place.
+                </p>
+
+
+                <div class="document-summary-grid">
+
+
+                    <!-- INSURANCE -->
+
+                    <div class="document-summary">
+
+                        <h3>
+                            🛡️ Insurance
+                        </h3>
+
+
+                        <p>
+
+                            <strong>
+                                Policy Number:
+                            </strong>
+
+                            <span id="insuranceNumber">
+                                Not added
+                            </span>
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>
+                                Provider:
+                            </strong>
+
+                            <span id="insuranceProvider">
+                                Not added
+                            </span>
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>
+                                Expiry:
+                            </strong>
+
+                            <span id="insuranceExpiry">
+                                Not added
+                            </span>
+
+                        </p>
+
+
+                        <span
+                            id="insuranceStatus"
+                            class="document-status-badge status-not-added"
+                        >
+                            ⚪ Not Added
+                        </span>
+
+                    </div>
+
+
+                    <!-- PUC -->
+
+                    <div class="document-summary">
+
+                        <h3>
+                            📄 PUC
+                        </h3>
+
+
+                        <p>
+
+                            <strong>
+                                Certificate Number:
+                            </strong>
+
+                            <span id="pucNumber">
+                                Not added
+                            </span>
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>
+                                Issuing Center:
+                            </strong>
+
+                            <span id="pucProvider">
+                                Not added
+                            </span>
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>
+                                Expiry:
+                            </strong>
+
+                            <span id="pucExpiry">
+                                Not added
+                            </span>
+
+                        </p>
+
+
+                        <span
+                            id="pucStatus"
+                            class="document-status-badge status-not-added"
+                        >
+                            ⚪ Not Added
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="document-manage-actions">
+
+                    <button
+                        class="primary-btn"
+                        id="documentButton"
+                        type="button"
+                    >
+                        🛡️ Manage Insurance & PUC
+                    </button>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        <div
+            id="error"
+            class="error-state"
+            style="display: none;"
+        >
+
+            <h2>
+                Vehicle Not Found
+            </h2>
+
+
+            <p>
+                We couldn't find this vehicle.
+            </p>
+
+
+            <button
+                class="primary-btn"
+                type="button"
+                onclick="goBack()"
+            >
+                Back to Vehicles
+            </button>
+
+        </div>
+
+    </main>
+
+
+    <script src="js/vehicle-details.js"></script>
+
+</body>
+
+</html>
