@@ -10,7 +10,7 @@ from flask_jwt_extended import (
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
-from flask_mail import Mail, Message
+import resend
 from apscheduler.schedulers.background import BackgroundScheduler
 from sqlalchemy import text
 from datetime import datetime, date, timedelta
@@ -97,6 +97,30 @@ app.config["MAIL_DEFAULT_SENDER"] = os.getenv(
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 mail = Mail(app)
+
+# =========================
+# RESEND EMAIL CONFIGURATION
+# =========================
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
+RESEND_FROM_EMAIL = os.getenv(
+    "RESEND_FROM_EMAIL",
+    "onboarding@resend.dev"
+)
+
+if RESEND_API_KEY:
+    resend.api_key = RESEND_API_KEY
+
+
+def send_email_via_resend(to_email, subject, html):
+    if not RESEND_API_KEY:
+        raise Exception("RESEND_API_KEY is not configured")
+
+    return resend.Emails.send({
+        "from": RESEND_FROM_EMAIL,
+        "to": [to_email],
+        "subject": subject,
+        "html": html
+    })
 
 
 # =========================
@@ -256,10 +280,10 @@ def send_document_reminder_email(
     """
 
     try:
-        message = Message(
-            subject=subject,
-            recipients=[user.email],
-            html=html
+         send_email_via_resend( to_email=user.email,
+                               subject=subject,
+                               html=html
+
         )
 
         mail.send(message)
