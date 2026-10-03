@@ -10,6 +10,7 @@ from flask_jwt_extended import (
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
+from flask_mail import Mail, Message
 import resend
 from apscheduler.schedulers.background import BackgroundScheduler
 from sqlalchemy import text
