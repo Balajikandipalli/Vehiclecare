@@ -1342,3 +1342,60 @@ loadReminders();
 loadDocumentAlerts();
 
 loadDashboardStatus();
+
+// ==========================
+// SEND TEST EMAIL
+// ==========================
+
+async function sendTestEmail() {
+
+    const button =
+        document.getElementById("testEmailButton");
+
+    button.disabled = true;
+    button.textContent = "Sending...";
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/api/reminders/test`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Authorization":
+                        `Bearer ${token}`
+                }
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            alert(
+                result.message ||
+                "Unable to send test email."
+            );
+            return;
+        }
+
+        alert(
+            result.message ||
+            "Test email sent successfully!"
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Test email error:",
+            error
+        );
+
+        alert("Unable to connect to server.");
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = "Send Test Email";
+    }
+}
