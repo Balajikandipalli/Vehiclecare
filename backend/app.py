@@ -10,7 +10,6 @@ from flask_jwt_extended import (
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
-from flask_mail import Mail, Message
 import resend
 from apscheduler.schedulers.background import BackgroundScheduler
 from sqlalchemy import text
@@ -58,7 +57,11 @@ def allowed_document_file(filename):
 # CONFIGURATION
 # =========================
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///vehiclecare.db"
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///vehiclecare.db")
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 app.config["JWT_SECRET_KEY"] = os.getenv(
@@ -70,34 +73,8 @@ app.config["JWT_SECRET_KEY"] = os.getenv(
 # EMAIL CONFIGURATION
 # =========================
 
-app.config["MAIL_SERVER"] = os.getenv(
-    "MAIL_SERVER",
-    "smtp.gmail.com"
-)
-
-app.config["MAIL_PORT"] = int(
-    os.getenv("MAIL_PORT", "587")
-)
-
-app.config["MAIL_USE_TLS"] = True
-app.config["MAIL_USE_SSL"] = False
-
-app.config["MAIL_USERNAME"] = os.getenv(
-    "MAIL_USERNAME"
-)
-
-app.config["MAIL_PASSWORD"] = os.getenv(
-    "MAIL_PASSWORD"
-)
-
-app.config["MAIL_DEFAULT_SENDER"] = os.getenv(
-    "MAIL_FROM",
-    os.getenv("MAIL_USERNAME")
-)
-
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
-mail = Mail(app)
 
 # =========================
 # RESEND EMAIL CONFIGURATION
@@ -281,21 +258,17 @@ def send_document_reminder_email(
     """
 
     try:
-         send_email_via_resend( to_email=user.email,
-                               subject=subject,
-                               html=html
-
+        send_email_via_resend(
+            to_email=user.email,
+            subject=subject,
+            html=html
         )
 
-        mail.send(message)
-
-        # Update last reminder information
         document.last_reminder_date = today
         document.last_reminder_status = reminder_status
 
         db.session.commit()
 
-        # Save notification history
         save_notification_history(
             user=user,
             vehicle=vehicle,
@@ -751,45 +724,43 @@ class NotificationHistory(db.Model):
 with app.app_context():
     db.create_all()
 
-    # Safe SQLite migration for existing databases.
-    # This preserves existing users, vehicles and services.
-    try:
-        result = db.session.execute(
-            text("PRAGMA table_info(service)")
-        )
-
-        service_columns = {
-            row[1]
-            for row in result
-        }
-
-        if "last_reminder_date" not in service_columns:
-            db.session.execute(
-                text("""
-                    ALTER TABLE service
-                    ADD COLUMN last_reminder_date VARCHAR(20)
-                """)
+    # Safe SQLite migration for older local databases.
+    # PostgreSQL gets the current schema from db.create_all().
+    if db.engine.dialect.name == "sqlite":
+        try:
+            result = db.session.execute(
+                text("PRAGMA table_info(service)")
             )
 
-        if "last_reminder_status" not in service_columns:
-            db.session.execute(
-                text("""
-                    ALTER TABLE service
-                    ADD COLUMN last_reminder_status VARCHAR(30)
-                """)
+            service_columns = {
+                row[1]
+                for row in result
+            }
+
+            if "last_reminder_date" not in service_columns:
+                db.session.execute(
+                    text("""
+                        ALTER TABLE service
+                        ADD COLUMN last_reminder_date VARCHAR(20)
+                    """)
+                )
+
+            if "last_reminder_status" not in service_columns:
+                db.session.execute(
+                    text("""
+                        ALTER TABLE service
+                        ADD COLUMN last_reminder_status VARCHAR(30)
+                    """)
+                )
+
+            db.session.commit()
+
+        except Exception as error:
+            db.session.rollback()
+            print(
+                "Database migration warning:",
+                error
             )
-
-        # Vehicle document table is created by db.create_all().
-        # The following check keeps this startup migration safe
-        # for older installations.
-        db.session.commit()
-
-    except Exception as error:
-        db.session.rollback()
-        print(
-            "Database migration warning:",
-            error
-        )
 
 
 # =========================
@@ -2293,16 +2264,12 @@ def send_service_reminder_email(
     </body>
     </html>
     """
-
     try:
-
-        message = Message(
+        send_email_via_resend(
+            to_email=user.email,
             subject=subject,
-            recipients=[user.email],
             html=html
         )
-
-        mail.send(message)
 
         service.last_reminder_date = today
         service.last_reminder_status = reminder_status
@@ -2310,19 +2277,18 @@ def send_service_reminder_email(
         db.session.commit()
 
         save_notification_history(
-    user=user,
-    vehicle=vehicle,
-    service=service,
-    notification_type="SERVICE",
-    reminder_status=reminder_status,
-    recipient=user.email,
-    subject=subject,
-    status="SENT"
-)
-
-
+            user=user,
+            vehicle=vehicle,
+            service=service,
+            notification_type="SERVICE",
+            reminder_status=reminder_status,
+            recipient=user.email,
+            subject=subject,
+            status="SENT"
+        )
 
         return True, "Email sent successfully"
+
 
     except Exception as error:
 
@@ -2473,45 +2439,42 @@ def test_reminder_email():
         }), 400
 
     try:
+        html = f"""
+        <div style="
+            font-family:Arial,sans-serif;
+            max-width:600px;
+            margin:auto;
+            padding:30px;
+        ">
+            <h1 style="color:#2563eb;">
+                VehicleCare 🚗
+            </h1>
 
-        message = Message(
+            <h2>
+                Email Configuration Successful
+            </h2>
+
+            <p>
+                Hello {user.name},
+            </p>
+
+            <p>
+                This is a test email from your
+                VehicleCare application.
+            </p>
+
+            <p>
+                Your email notification system is
+                working correctly.
+            </p>
+        </div>
+        """
+
+        send_email_via_resend(
+            to_email=user.email,
             subject="VehicleCare Test Email",
-            recipients=[user.email],
-            html=f"""
-            <div style="
-                font-family:Arial,sans-serif;
-                max-width:600px;
-                margin:auto;
-                padding:30px;
-            ">
-
-                <h1 style="color:#2563eb;">
-                    VehicleCare 🚗
-                </h1>
-
-                <h2>
-                    Email Configuration Successful
-                </h2>
-
-                <p>
-                    Hello {user.name},
-                </p>
-
-                <p>
-                    This is a test email from your
-                    VehicleCare application.
-                </p>
-
-                <p>
-                    Your email notification system is
-                    working correctly.
-                </p>
-
-            </div>
-            """
+            html=html
         )
-
-        mail.send(message)
 
         return jsonify({
             "success": True,
