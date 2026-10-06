@@ -2591,6 +2591,71 @@ def dashboard_document_reminders():
         "upcoming": upcoming
     })
 
+# ==================================================
+# ACCOUNT / EMAIL UPDATE
+# ==================================================
+
+@app.route(
+    "/api/auth/update-email",
+    methods=["PUT"]
+)
+@jwt_required()
+def update_email():
+
+    user_id = int(get_jwt_identity())
+
+    data = request.get_json() or {}
+
+    new_email = data.get("email")
+
+    if not new_email:
+        return jsonify({
+            "success": False,
+            "message": "Email is required"
+        }), 400
+
+    new_email = new_email.strip().lower()
+
+    if "@" not in new_email or "." not in new_email.split("@")[-1]:
+        return jsonify({
+            "success": False,
+            "message": "Please enter a valid email address"
+        }), 400
+
+    user = db.session.get(User, user_id)
+
+    if not user:
+        return jsonify({
+            "success": False,
+            "message": "User not found"
+        }), 404
+
+    existing_user = User.query.filter(
+        User.email == new_email,
+        User.id != user_id
+    ).first()
+
+    if existing_user:
+        return jsonify({
+            "success": False,
+            "message": "This email is already registered"
+        }), 409
+
+    user.email = new_email
+
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": "Email updated successfully",
+        "user": {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "phone": user.phone,
+            "role": user.role
+        }
+    })
 
 # ==================================================
 # DASHBOARD REMINDER SUMMARY
